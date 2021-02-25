@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require("inquirer");
+const table = require("console.table")
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -22,3 +23,26 @@ connection.connect((err) => {
   promptMain();
 });
 /////////////////////////
+
+const promptMain = () => {
+  return inquirer.prompt([
+    {
+    type: 'list',
+      name: 'action',
+      message: 'What would you like to do?',
+      choices: ["Find songs by artist", "Search for song","Find artists with top song and album in same year","Exit"]
+    }
+  ])
+  .then((data)=> {
+      if (data.action === "Find songs by artist") {
+        promptArtist();
+      } if (data.action === "Search for song") {
+          promptSong();
+      } if (data.action === "Find artists with top song and album in same year") {
+          albumSong();
+      } if (data.action === "Exit") {
+              connection.end();
+              return;
+      }
+  });
+};
