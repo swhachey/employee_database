@@ -30,19 +30,45 @@ const promptMain = () => {
     type: 'list',
       name: 'action',
       message: 'What would you like to do?',
-      choices: ["Find songs by artist", "Search for song","Find artists with top song and album in same year","Exit"]
+      choices: ["View all employees?","Add Employee?", "Add Role?","Add Department?", "Update employee role?"]
     }
   ])
   .then((data)=> {
-      if (data.action === "Find songs by artist") {
-        promptArtist();
-      } if (data.action === "Search for song") {
-          promptSong();
-      } if (data.action === "Find artists with top song and album in same year") {
-          albumSong();
-      } if (data.action === "Exit") {
-              connection.end();
-              return;
+      switch (data.action) {
+        case "View all employees?":
+          allEmployees()
+          break;
+        case "Add Employee?":
+          addEmployee()
+          break;
+        case "Add Department?":
+          addDepartment()
+          break;
+        case "Add Role?":
+          addRole()
+          break;
+        case "Update employee role?":
+          updateRole()
+          break;
+        default:
+          connection.end()
       }
   });
 };
+
+const allEmployees = () => {
+  connection.query(`SELECT * FROM employee JOIN department ON employee.role_id = department.id`, (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    connection.end()
+  });
+  promptMain();
+};
+
+const addEmployee = () => {console.log("Yup")}
+
+const addDepartment = () => {console.log("Yup")}
+
+const addRole = () => {console.log("Yup")}
+
+const updateRole = () => {console.log("Yup")}
