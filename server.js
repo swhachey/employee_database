@@ -30,13 +30,19 @@ const promptMain = () => {
     type: 'list',
       name: 'action',
       message: 'What would you like to do?',
-      choices: ["View all employees?","Add Employee?", "Add Role?","Add Department?", "Update employee role?"]
+      choices: ["View all employees?","View all Roles?","View all Departments?" ,"Add Employee?", "Add Role?","Add Department?", "Update employee role?"]
     }
   ])
   .then((data)=> {
       switch (data.action) {
         case "View all employees?":
           allEmployees()
+          break;
+        case "View all Roles?":
+          allRoles()
+          break;
+        case "View all Departments?":
+          allDepartments()
           break;
         case "Add Employee?":
           addEmployee()
@@ -57,11 +63,26 @@ const promptMain = () => {
 };
 
 const allEmployees = () => {
-  connection.query(`SELECT * FROM employee role JOIN role ON employee.role_id = role.id`, (err, res) => {
+  connection.query(`SELECT * FROM employee JOIN role ON employee.role_id = role.id`, (err, res) => {
     if (err) throw err;
     console.log("\n-------------------------\n")
     console.table(res)
-    connection.end()
+  });
+  promptMain();
+};
+const allRoles = () => {
+  connection.query(`SELECT * FROM role`, (err, res) => {
+    if (err) throw err;
+    console.log("\n-------------------------\n")
+    console.table(res)
+  });
+  promptMain();
+};
+const allDepartments = () => {
+  connection.query(`SELECT * FROM department`, (err, res) => {
+    if (err) throw err;
+    console.log("\n-------------------------\n")
+    console.table(res)
   });
   promptMain();
 };
@@ -98,8 +119,87 @@ const addEmployee = () => {return inquirer.prompt([
 
 }
 
-const addDepartment = () => {console.log("Yup")}
+const addDepartment = () => {return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'departmentname',
+      message: 'Department name?',
+    },
+  ])
+  .then((data)=>{
+    connection.query('INSERT INTO department SET ?', 
+    {
+      name: data.departmentname,
+    }, (err, res) => {
+      if (err) throw err;
+      console.table(`${res.affectedRows} department added!\n`)
+    })
+    allEmployees()
+  })
+};
 
-const addRole = () => {console.log("Yup")}
+const addRole = () => {
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'title',
+      message: 'Role title?',
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: 'Salary?',
+    },
+    {
+      type: 'input',
+      name: 'deptid',
+      message: 'Department ID?',
+    },
+  ])
+  .then((data)=>{
+    connection.query('INSERT INTO role SET ?', 
+    {
+      title: data.title,
+      salary: data.salary,
+      department_id: data.deptid,
+    }, (err, res) => {
+      if (err) throw err;
+      console.table(`${res.affectedRows} Role added!\n`)
+    })
+    allEmployees()
+  })
+};
 
-const updateRole = () => {console.log("Yup")}
+const updateRole = () => {
+  return inquirer.prompt([
+     {
+      type: 'input',
+      name: 'roleid',
+      message: 'What Role ID to update?',
+    },
+    {
+      type: 'input',
+      name: 'newrole',
+      message: 'New Role Title?',
+    },
+   
+  ])
+  .then((data)=>{connection.query(
+    'UPDATE role SET ? WHERE ?',
+    [
+      {
+        title: data.newrole,
+      },
+      {
+        id: data.roleid,
+      },
+    ],
+    (err, res) => {
+      if (err) throw err;
+      console.log(`${res.affectedRows} Roles updated!\n`);
+      promptMain();
+        }
+  )}
+  )
+  }
+  
