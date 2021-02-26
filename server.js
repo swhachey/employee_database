@@ -57,15 +57,46 @@ const promptMain = () => {
 };
 
 const allEmployees = () => {
-  connection.query(`SELECT * FROM employee JOIN department ON employee.role_id = department.id`, (err, res) => {
+  connection.query(`SELECT * FROM employee role JOIN role ON employee.role_id = role.id`, (err, res) => {
     if (err) throw err;
+    console.log("\n-------------------------\n")
     console.table(res)
     connection.end()
   });
   promptMain();
 };
 
-const addEmployee = () => {console.log("Yup")}
+const addEmployee = () => {return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'firstname',
+      message: 'Employee First Name?',
+    },
+    {
+      type: 'input',
+      name: 'lastname',
+      message: 'Employee Last Name?',
+    },
+    {
+      type: 'input',
+      name: 'roleid',
+      message: 'What is their role ID?',
+    }
+  ])
+  .then((data)=>{
+    connection.query('INSERT INTO employee SET ?', 
+    {
+      first_name: data.firstname,
+      last_name: data.lastname,
+      role_id: data.roleid,
+    }, (err, res) => {
+      if (err) throw err;
+      console.table(`${res.affectedRows} employee added!\n`)
+    })
+    allEmployees()
+  })
+
+}
 
 const addDepartment = () => {console.log("Yup")}
 
